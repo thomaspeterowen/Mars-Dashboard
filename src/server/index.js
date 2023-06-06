@@ -17,10 +17,21 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 const proxy = 'http://195.233.9.60:8080';
 const proxyAgent = new HttpsProxyAgent(proxy);
 
-// example API call
-app.get('/apod', async (req, res) => {
+// NASA pic gallery from specific rover (Curiosity/Opportunity/Spirit)
+app.get('/rovers/:name', async (req, res) => {
     try {
-        let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`, {agent: proxyAgent})
+        let image = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${req.params.name}/latest_photos?api_key=${process.env.API_KEY}`, {agent: proxyAgent})
+            .then(res => res.json())
+        res.send({ image })
+    } catch (err) {
+        console.log('error:', err);
+    }
+})
+
+// NASA mars rover manifest info
+app.get('/rovers/manifest/:name', async (req, res) => {
+    try {
+        let image = await fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${req.params.name}/?api_key=${process.env.API_KEY}`, {agent: proxyAgent})
             .then(res => res.json())
         res.send({ image })
     } catch (err) {

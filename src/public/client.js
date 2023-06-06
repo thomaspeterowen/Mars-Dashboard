@@ -1,7 +1,10 @@
 let store = {
     user: { name: "Student" },
     apod: '',
+    picList: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
+    selectedRover: '',
+    selectedRoverData: ''
 }
 
 // add our markup to the page
@@ -26,17 +29,18 @@ const App = (state) => {
         <main>
             ${Greeting(store.user.name)}
             <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
-                <p>
-                    One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
-                    the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
-                    This endpoint structures the APOD imagery and associated metadata so that it can be repurposed for other
-                    applications. In addition, if the concept_tags parameter is set to True, then keywords derived from the image
-                    explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
-                    but generally help with discoverability of relevant imagery.
-                </p>
-                ${ImageOfTheDay(apod)}
+                <h2><i class="fa-solid fa-shuttle-space"></i> Introduction</h3>
+                <p>The NASA API, or Application Programming Interface, is a tool provided by NASA (National Aeronautics and Space Administration) that allows developers to access and retrieve data and information from NASA's vast collection of resources. It's like a digital gateway that enables software programs and websites to interact with NASA's databases and services. This API provides access to a wide range of data, including images, videos, satellite data, Mars rover data, and much more. Developers can use this data to create applications, websites, or research projects related to space exploration, astronomy, and Earth science. The NASA API opens up a world of possibilities for developers to explore and utilize NASA's extensive knowledge and discoveries in an easy and convenient way.</p>
+                <p>Below I have highlighted one of the most popular API interfaces:</p>
+                <div class="section">
+                    <h3><i class="fa-solid fa-mars"></i> NASA Mars Rover API</h3>
+                    <p>The NASA Mars Rover API is an interface provided by NASA that allows developers to access and retrieve data related to the Mars rovers' missions. NASA has sent several rovers to explore the surface of Mars, including the popular rovers like Spirit, Opportunity, and Curiosity.</p>
+                    <p>The Mars Rover API provides developers with access to a wide range of data gathered by these rovers, such as images, weather reports, mission status, and scientific measurements. Developers can use the API to programmatically retrieve specific data sets or browse through the extensive collection of images and information captured by the rovers on the Martian surface.</p>
+                    <p>Select a rover to show the photos:</p>
+                    ${RoverSelection(store.selectedRover)}
+                    ${processElements(store)}
+                </div>
+                <p>Website made possible by the NASA API.</p>
             </section>
         </main>
         <footer></footer>
@@ -48,9 +52,10 @@ window.addEventListener('load', () => {
     render(root, store)
 })
 
-// ------------------------------------------------------  COMPONENTS
+// -----  COMPONENTS  -----
 
 // Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
+
 const Greeting = (name) => {
     if (name) {
         return `
@@ -63,43 +68,62 @@ const Greeting = (name) => {
     `
 }
 
-// Example of a pure function that renders infomation requested from the backend
-const ImageOfTheDay = (apod) => {
-
-    // If image does not already exist, or it is not from today -- request it again
-    const today = new Date()
-    const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
-
-    console.log(photodate.getDate() === today.getDate());
-    if (!apod || apod.date === today.getDate() ) {
-        getImageOfTheDay(store)
+const processElements = function( store ){
+    if (store.picList && store.selectedRoverData) {
+        return `
+            <section>
+                <p>${store.selectedRover} was launched on ${store.selectedRoverData.image.photo_manifest.launch_date}, landing on Mars on ${store.selectedRoverData.image.photo_manifest.landing_date}</p>
+                <p>The status of ${store.selectedRover} is currently ${store.selectedRoverData.image.photo_manifest.status}, and during its lifetime, ${store.selectedRover} has sent back ${store.selectedRoverData.image.photo_manifest.total_photos} photos.</p>
+                <p>Check out some of ${store.selectedRover}'s most recent photos. The following photos were taken on ${store.picList.image.latest_photos[0].earth_date}.</p>
+                <div class="photos">
+                    ${store.picList.image.latest_photos.map(photo => (
+                        `<img class="rover-img" src=${photo.img_src} width=300px/>` 
+                    )).join('')}
+                </div>
+            </section>
+        `
     }
-
-    // check if the photo of the day is actually type video!
-    if (apod.media_type === "video") {
-        return (`
-            <p>See today's featured video <a href="${apod.url}">here</a></p>
-            <p>${apod.title}</p>
-            <p>${apod.explanation}</p>
-        `)
-    } else {
-        return (`
-            <img src="${apod.image.url}" height="350px" width="100%" />
-            <p>${apod.image.explanation}</p>
-        `)
-    }
+    return ``
 }
 
-// ------------------------------------------------------  API CALLS
+const doThisOnChange = function(value, state)
+    {    
+        let { selectedRover } = state;
+        selectedRover = value;
+        updateStore(store, { selectedRover });
+        getRoverData(store)
+        getRoverPics(store)
+        processElements(store)    }
 
-// Example API call
-const getImageOfTheDay = (state) => {
-    let { apod } = state
+const RoverSelection = () => {
 
-    fetch(`http://localhost:3000/apod`)
+    return (`
+        ${store.rovers.map(val => (
+            `<button class="btn btn-1 btn-1a" value="${val}" onclick='doThisOnChange(this.value, store)'>${val}</button>` 
+        )).join('')}
+    `)
+}
+
+// -----  API CALLS  -----
+
+// API: rover specific photo library
+const getRoverPics = (state) => {
+    let { picList } = state
+
+    fetch(`http://localhost:3000/rovers/${store.selectedRover}`)
         .then(res => res.json())
-        .then(apod => updateStore(store, { apod }))
+        .then(picList => updateStore(store, { picList }))
 
-    return data
+    console.log(state)
+}
+
+// API: rover specific photo library
+const getRoverData = (state) => {
+    let { selectedRoverData } = state
+
+    fetch(`http://localhost:3000/rovers/manifest/${store.selectedRover}`)
+        .then(res => res.json())
+        .then(selectedRoverData => updateStore(store, { selectedRoverData }))
+
+    console.log(state)
 }

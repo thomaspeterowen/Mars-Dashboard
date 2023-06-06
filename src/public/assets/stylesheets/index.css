@@ -3,8 +3,10 @@
 body {
   display: flex;
   flex-direction: column;
-  font-family: Arial;
+  font-family: system-ui, sans-serif;
   min-height: 100vh;
+  background-color: teal;
+  color: #f8ffa7;
 }
 
 header {
@@ -13,26 +15,133 @@ header {
 
 main {
   flex: 1;
-  padding: 20px;
+  padding: 10px;
+}
+
+div#root {
+  outline: currentcolor solid 1px;
+}
+
+div.section {
+  outline: currentcolor solid 1px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 footer {
   /* footer styles */
 }
 
+.btn {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	background: none;
+	cursor: pointer;
+  padding: 10px 40px;
+	display: inline-block;
+  margin: 8px 10px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-weight: 700;
+	outline: none;
+	position: relative;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.btn:after {
+	content: '';
+	position: absolute;
+	z-index: -1;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+/* Button 1 */
+.btn-1 {
+	border: 3px solid #f8ffa7;
+	color: #f8ffa7;
+}
+
+/* Button 1a */
+.btn-1a:hover,
+.btn-1a:active {
+	color: teal;
+	background: #f8ffa7;
+}
+
+.rover-img {
+  padding: 5px
+}
+
 /* -------------------  TABLET  --------------------- */
 @media (min-width: 768px) {
-  /* use mobile */
+  .btn {
+    padding: 25px 80px;
+    margin: 15px 30px;
+  }
+
+  .rover-img {
+    padding: 10px
+  }
+
+  div.section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  main {
+    flex: 1;
+    padding: 20px;
+  }
 }
 
 /* -------------------  DESKTOP  -------------------- */
 
 @media (min-width: 1224px) {
-  /* use mobile */
+  .btn {
+    padding: 25px 80px;
+    margin: 15px 30px;
+  }
+
+  .rover-img {
+    padding: 10px
+  }
+
+  div.section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  main {
+    flex: 1;
+    padding: 20px;
+  }
 }
 
 /* -------------------  LARGE SCREENS  -------------- */
 
 @media (min-width: 1824px) {
-  /* use mobile */
+  .btn {
+    padding: 25px 80px;
+    margin: 15px 30px;
+  }
+
+  .rover-img {
+    padding: 20px
+  }
+
+  div.section {
+    padding: 40px;
+    margin-bottom: 40px;
+  }
+
+  main {
+    flex: 1;
+    padding: 40px;
+  }
 }
